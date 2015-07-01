@@ -2,22 +2,22 @@
 #'
 #' Data on bills in Congress goes back to 2009, and comes from a mix of sources:
 #' \itemize{
-#'  \item Scrapers at github.com/unitedstates for most data, including core status and history
-#'  information.
+#'  \item Scrapers at github.com/unitedstates for most data, including core status and
+#'  history information.
 #'  \item Bulk data at GPO's FDSys for version information, and full text.
-#'  \item The House' MajorityLeader.gov and Senate Democrats' official site for notices of upcoming
-#'  debate.
+#'  \item The House' MajorityLeader.gov and Senate Democrats' official site for
+#'  notices of upcoming debate.
 #' }
 #'
-#' @import httr assertthat jsonlite
 #' @export
 #' @template bills
 #' @template cg
 #'
 #' @details
-#' History: The history field includes useful flags and dates/times in a bill's life. The above is
-#' a real-life example of H.R. 3590 - not all fields will be present for every bill. Time fields
-#' can hold either dates or times - Congress is inconsistent about providing specific timestamps.
+#' History: The history field includes useful flags and dates/times in a bill's life.
+#' The above is a real-life example of H.R. 3590 - not all fields will be present
+#' for every bill. Time fields can hold either dates or times - Congress is inconsistent
+#' about providing specific timestamps.
 #'
 #' @return Committee details including subcommittees and all members.
 #'
@@ -35,10 +35,13 @@
 #' cg_bills(query='health care', history.enacted=TRUE)
 #' cg_bills(query='freedom of information')
 #' cg_bills(query='"freedom of information" accountab*')
-#' cg_bills(query='transparency accountability'~5, highlight=TRUE)
+#' cg_bills(query="'transparency accountability'~5", highlight=TRUE)
 #'
 #' # Disable pagination
 #' cg_bills(per_page='all')
+#'
+#' # most parameters are vectorized, pass in more than one value
+#' cg_bills(bill_id = c("hjres131-113", "hjres129-113", "s2921-113"))
 #' }
 
 cg_bills <- function(query = NULL, bill_id = NULL, bill_type = NULL, number = NULL,
@@ -58,15 +61,15 @@ cg_bills <- function(query = NULL, bill_id = NULL, bill_type = NULL, number = NU
   withdrawn_cosponsors_count=NULL, withdrawn_cosponsor_ids=NULL, committee_ids=NULL,
   related_bill_ids=NULL, enacted_as.congress=NULL,
   enacted_as.number=NULL, fields=NULL, page = 1, per_page = 20, order = NULL,
-  key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")),
-  return='table', ...)
-{
-  if(is.null(query)){
-    url <- 'https://congress.api.sunlightfoundation.com/bills'
+  key = NULL, as = 'table', ...) {
+
+  key <- check_key(key)
+  if (is.null(query)) {
+    url <- paste0(cgurl(), '/bills')
   } else {
-    url <- 'https://congress.api.sunlightfoundation.com/bills/search'
+    url <- paste0(cgurl(), '/bills/search')
   }
-  args <- suncompact(list(apikey=key,query=query,bill_id=bill_id,bill_type=bill_type,
+  args <- sc(list(apikey=key,query=query,bill_id=bill_id,bill_type=bill_type,
     number=number,congress=congress,chamber=chamber,introduced_on=introduced_on,
     last_action_at=last_action_at,last_vote_at=last_vote_at,last_version_on=last_version_on,
     highlight=highlight,history.active=ll(history.active), history.active_at=history.active_at,
@@ -94,10 +97,8 @@ cg_bills <- function(query = NULL, bill_id = NULL, bill_type = NULL, number = NU
     committee_ids=committee_ids, related_bill_ids=related_bill_ids, enacted_as.congress=enacted_as.congress,
     enacted_as.number=enacted_as.number))
 
-  tt <- GET(url, query=args, ...)
-  warn_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+  # return_obj(as, query(url, args, ...))
+  give_cg(as, url, "", args, ...)
 }
 
 ll <- function(x) if(!is.null(x)){ if(x) tolower(x) else x }

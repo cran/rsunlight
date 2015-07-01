@@ -1,6 +1,5 @@
 #' Politician aggregrates: Search for contributions to politicians.
 #'
-#' @import httr
 #' @export
 #' @param method (character) The query string. One of top_pol, top_con, unk_ind, top_ind, top_sec,
 #' local_breakdown, type_breakdown, fec_summary, fec_indexp
@@ -9,8 +8,7 @@
 #'    organization, individual or industry.
 #' @param limit (integer) Limit number of records returned.
 #' @template ie
-#' @return A list. Depends on parameters used. Ranges from a single ID returned to basic
-#'    information about the the contributions to and from each entity.
+#' @return A data.frame (default), list, or httr response object.
 #'
 #' @examples \dontrun{
 #' # Top politicians
@@ -48,10 +46,9 @@
 #' }
 
 ie_politicians <- function(method = NULL, entity_id = NULL, cycle = NULL, limit = NULL,
-  page = NULL, per_page = NULL, return='table',
-  key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")),
-  ...)
-{
+  page = NULL, per_page = NULL, as = 'table', key = NULL, ...) {
+
+  key <- check_key(key)
   urlsuffix <- switch(method,
     top_pol = sprintf('pols/top_%s.json', limit),
     top_con = sprintf('pol/%s/contributors.json', entity_id),
@@ -64,12 +61,9 @@ ie_politicians <- function(method = NULL, entity_id = NULL, cycle = NULL, limit 
     fec_indexp = sprintf('pol/%s/fec_indexp.json', entity_id)
   )
 
-  url <- sprintf('http://transparencydata.com/api/1.0/aggregates/%s', urlsuffix)
-  if(method=="top_pol") limit <- NULL
-  args <- suncompact(list(apikey = key, cycle = cycle, limit = limit))
+  url <- sprintf('%s/aggregates/%s', ieurl(), urlsuffix)
+  if (method == "top_pol") limit <- NULL
+  args <- sc(list(apikey = key, cycle = cycle, limit = limit))
 
-  tt <- GET(url, query=args, ...)
-  stop_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+  return_obj(as, query(url, args, ...))
 }

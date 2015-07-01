@@ -1,6 +1,5 @@
 #' Get federal contract details
 #'
-#' @import httr
 #' @template ie
 #' @param agency_id The FIPS code for the agency.
 #' @param agency_name Full-text search on the name of the agency.
@@ -27,13 +26,17 @@
 #' contractor.
 #' @param vendor_state The primary state in which the contractor does business.
 #' @param vendor_zipcode The primary zipcode in which the contractor does business.
-#' @return Details on federal government contracts in a list.
+#' @return A data.frame (default), list, or httr response object.
 #' @export
 #' @examples \dontrun{
 #' ie_contracts(vendor_city='indianapolis', page=1, per_page=5)
-#' 
+#'
 #' library('httr')
 #' ie_contracts(vendor_city='indianapolis', page=1, per_page=5, config=verbose())[,c(1:5)]
+#'
+#' # most parameters are vectorized, pass in more than one value
+#' ie_contracts(vendor_city = c('indianapolis', 'dallas'), per_page=5)
+#' ie_contracts(vendor_name = c('rolls-royce corporation', 'raytheon'), per_page=5)
 #' }
 ie_contracts <-  function(
     agency_id = NULL,
@@ -56,12 +59,10 @@ ie_contracts <-  function(
     vendor_state = NULL,
     vendor_zipcode = NULL,
     page = NULL,
-    per_page = NULL, return='table',
-    key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")),
-    ...)
-{
-  url <- "http://transparencydata.com/api/1.0/contracts.json"
-  args <- suncompact(list(apikey = key, agency_id = agency_id,
+    per_page = NULL, as = 'table', key = NULL, ...) {
+
+  key <- check_key(key)
+  args <- sc(list(apikey = key, agency_id = agency_id,
     agency_name = agency_name, contracting_agency_id = contracting_agency_id,
     contracting_agency_name = contracting_agency_name, current_amount = current_amount,
     fiscal_year = fiscal_year, maximum_amount = maximum_amount, place_district = place_district,
@@ -70,8 +71,5 @@ ie_contracts <-  function(
     vendor_city = vendor_city, vendor_district = vendor_district, vendor_duns = vendor_duns,
     vendor_name = vendor_name, vendor_parent_duns = vendor_parent_duns, vendor_state = vendor_state,
     vendor_zipcode = vendor_zipcode, page = page, per_page = per_page))
-  tt <- GET(url, query=args, ...)
-  stop_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+  give(as, ieurl(), "/contracts.json", args, ...)
 }

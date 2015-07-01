@@ -30,7 +30,7 @@
 #' most commonly used subset of fields only. To save on bandwidth, parsing time, and confusion,
 #' it's recommended to always specify which fields you will be using.
 #' @param key your SunlightLabs API key; loads from .Rprofile
-#' @param return (character) One of table (default), list, or response (httr response object)
+#' @param as (character) One of table (default), list, or response (httr response object)
 #' @param page Page to return. Default: 1. You can use this in combination with the
 #' per_page parameter to get more than the default or max number of results per page.
 #' @param per_page Number of records to return. Default: 20. Max: 50.
@@ -40,7 +40,7 @@
 #' direction is \code{desc}, because it is expected most queries will sort by a date. Any field
 #' which can be used for filtering may be used for sorting. On full-text search endpoints (URLs
 #' ending in \code{/search}), you may sort by score to order by relevancy.
-#' 
+#'
 #' @template cg_query
 #'
 #' @details Two parameters can be passed on that vary with vote and/or party plus vote:
@@ -55,23 +55,22 @@
 #' cg_votes(chamber='senate', order='voted_at')
 #' cg_votes(query='guns')
 #' cg_votes(voter_ids.A000055__exists=TRUE)
-#' cg_votes(voted_at__gte='2013-07-02T4:00:00Z')
+#'
+#' # Pass in more than one value for a parameter
+#' cg_votes(chamber = c('house', 'senate'))
 #' }
 
 cg_votes <- function(roll_id=NULL, chamber=NULL, number=NULL, year=NULL, congress=NULL,
   voted_at=NULL, vote_type=NULL, roll_type=NULL, required=NULL, result=NULL, bill_id=NULL,
   nomination_id=NULL, query=NULL, fields=NULL, page=1, per_page=20, order=NULL,
-  key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")), return='table',
-  callopts=list(), ...)
-{
-  url <- 'https://congress.api.sunlightfoundation.com/votes'
-  args <- suncompact(list(apikey=key,roll_id=roll_id, chamber=chamber, number=number, year=year,
+  key = NULL, as = 'table', callopts = list(), ...) {
+
+  key <- check_key(key)
+  args <- sc(list(apikey=key,roll_id=roll_id, chamber=chamber, number=number, year=year,
       congress=congress, voted_at=voted_at, vote_type=vote_type, roll_type=roll_type,
       required=required, result=result, bill_id=bill_id, nomination_id=nomination_id,
       per_page=per_page, page=page, fields=fields, order=order, ...))
 
-  tt <- GET(url, query=args, callopts)
-  stop_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+  # return_obj(as, query(paste0(cgurl(), "/votes"), args, callopts, ...))
+  give_cg(as, cgurl(), "/votes", args, callopts)
 }

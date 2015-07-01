@@ -1,10 +1,9 @@
 #' Write data from any rsunlight function output to a csv file on your machine.
 #'
-#' @import assertthat
 #' @keywords internal
 #' @param x Output from any of the rsunlight functions.
 #' @param file File name, with path.
-#' @param ... Further args passed to read.csv
+#' @param ... Further arguments passed to read.csv
 #' @details This function attemps to coerce the raw output from each rsunlight function to a
 #' data.frame to write to csv, but it may fail in some cases. You can always make your own
 #' data.frame.
@@ -37,7 +36,7 @@ sunlight_tocsv <- function(x, file="~/", ...){
 #' @rdname sunlight_tocsv
 #' @keywords internal
 sunlight_tocsv.cg_getcommittees <- function(x, file="~/", ...){
-  assert_that(is(x, "cg_getcommittees"))
+  stopifnot(is(x, "cg_getcommittees"))
   notmembers <- x$committee[!names(x$committee) %in% "members"]
   notmembers <- replacemissing(notmembers)
   members <- do.call(rbind.fill, lapply(x$committee$members, data.frame, stringsAsFactors = FALSE))
@@ -49,7 +48,7 @@ sunlight_tocsv.cg_getcommittees <- function(x, file="~/", ...){
 #' @rdname sunlight_tocsv
 #' @keywords internal
 sunlight_tocsv.cg_getcommitteesallleg <- function(x, file="~/", ...){
-  assert_that(is(x, "cg_getcommitteesallleg"))
+  stopifnot(is(x, "cg_getcommitteesallleg"))
   dat <- lapply(x$committees, function(b){
     df <- do.call(rbind.fill, lapply(b$committee$subcommittees, data.frame, stringsAsFactors = FALSE))
     tmp <- b$committee[!names(b$committee) %in% "subcommittees"]
@@ -69,7 +68,7 @@ sunlight_tocsv.cg_getcommitteesallleg <- function(x, file="~/", ...){
 #' @rdname sunlight_tocsv
 #' @keywords internal
 sunlight_tocsv.cg_getcommitteelist <- function(x, file="~/", ...){
-  assert_that(is(x, "cg_getcommitteelist"))
+  stopifnot(is(x, "cg_getcommitteelist"))
   iter <- x$committees
   iter <- replacemissing(iter)
   df <- do.call(rbind.fill, lapply(iter, data.frame, stringsAsFactors = FALSE))
@@ -80,7 +79,7 @@ sunlight_tocsv.cg_getcommitteelist <- function(x, file="~/", ...){
 #' @rdname sunlight_tocsv
 #' @keywords internal
 sunlight_tocsv.cg_getdistrictlatlong <- function(x, file="~/", ...){
-  assert_that(is(x, "cg_getdistrictlatlong"))
+  stopifnot(is(x, "cg_getdistrictlatlong"))
   iter <- x$districts
   df <- do.call(rbind.fill, lapply(iter, data.frame, stringsAsFactors = FALSE))
   write.csv(df, file=file, ..., row.names=FALSE)
@@ -90,7 +89,7 @@ sunlight_tocsv.cg_getdistrictlatlong <- function(x, file="~/", ...){
 #' @rdname sunlight_tocsv
 #' @keywords internal
 sunlight_tocsv.cg_getdistrictzip <- function(x, file="~/", ...){
-  assert_that(is(x, "cg_getdistrictzip"))
+  stopifnot(is(x, "cg_getdistrictzip"))
   iter <- x$districts
   df <- do.call(rbind.fill, lapply(iter, data.frame, stringsAsFactors = FALSE))
   write.csv(df, file=file, ..., row.names=FALSE)
@@ -100,7 +99,7 @@ sunlight_tocsv.cg_getdistrictzip <- function(x, file="~/", ...){
 #' @rdname sunlight_tocsv
 #' @keywords internal
 sunlight_tocsv.cg_getlegislator <- function(x, file="~/", ...){
-  assert_that(is(x, "cg_getlegislator"))
+  stopifnot(is(x, "cg_getlegislator"))
   if(x$found == 1){
     iter <- x$data
     df <- data.frame(iter, stringsAsFactors = FALSE)

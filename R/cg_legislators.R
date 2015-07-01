@@ -1,54 +1,54 @@
 #' Search for legislators.
 #'
-#' @import httr
 #' @template getleg
-#' 
+#'
 #' @param latitude latitude of coordinate
 #' @param longitude longitude of coordinate
 #' @param zip zip code to search
 #' @template cg
 #' @template cg_query
-#' 
+#'
 #' @return List of output fields.
 #' @export
 #' @examples \dontrun{
 #' cg_legislators(last_name = 'Pelosi')
 #' cg_legislators(party = 'D')
-#' cg_legislators(twitter_id = 'SenRandPaul')
 #' cg_legislators(facebook_id = 'mitchmcconnell')
 #' cg_legislators(latitude = 35.778788, longitude = -78.787805)
 #' cg_legislators(zip = 77006)
-#' 
+#'
 #' # Output a list
-#' cg_legislators(last_name = 'Pelosi', return='list')
+#' cg_legislators(last_name = 'Pelosi', as='list')
 #' # Output an httr response object, for debugging purposes
-#' cg_legislators(last_name = 'Pelosi', return='response')
-#' 
+#' cg_legislators(last_name = 'Pelosi', as='response')
+#'
 #' # Pagination
 #' cg_legislators(party = 'D', per_page=2)
-#' 
+#'
 #' # Curl debugging
 #' library('httr')
 #' cg_legislators(party = 'D', config=verbose())
 #' cg_legislators(party = 'D', config=timeout(0.1))
+#'
+#' # most parameters are vectorized, pass in more than one value
+#' cg_legislators(party = c('D', 'R'))
 #' }
 
 cg_legislators <- function(title=NULL, first_name=NULL, middle_name=NULL,
     last_name=NULL, name_suffix=NULL, nickname=NULL, party=NULL, state=NULL,
-    state_name=NULL, state_rank=NULL, district=NULL, in_office=NULL, chamber=NULL, 
-    gender=NULL, phone=NULL, fax=NULL, office=NULL, website=NULL, contact_form=NULL, 
-    email=NULL, congress_office=NULL, bioguide_id=NULL, ocd_id=NULL, thomas_id=NULL, 
-    lis_id=NULL, crp_id=NULL, icpsr_id=NULL, votesmart_id=NULL, fec_ids=NULL, 
+    state_name=NULL, state_rank=NULL, district=NULL, in_office=NULL, chamber=NULL,
+    gender=NULL, phone=NULL, fax=NULL, office=NULL, website=NULL, contact_form=NULL,
+    email=NULL, congress_office=NULL, bioguide_id=NULL, ocd_id=NULL, thomas_id=NULL,
+    lis_id=NULL, crp_id=NULL, icpsr_id=NULL, votesmart_id=NULL, fec_ids=NULL,
     govtrack_id=NULL, congresspedia_url=NULL, twitter_id=NULL, youtube_id=NULL,
     facebook_id=NULL, senate_class=NULL, term_start=NULL, term_end=NULL, birthday=NULL,
-    latitude = NULL, longitude = NULL, zip = NULL, query=NULL, fields=NULL, page=1, per_page=20, 
-    order=NULL,
-    key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")), return='table',
-    ...)
-{
+    latitude = NULL, longitude = NULL, zip = NULL, query=NULL, fields=NULL, page=1, per_page=20,
+    order=NULL, key = NULL, as = 'table', ...) {
+
+  key <- check_key(key)
   if(!is.null(latitude) | !is.null(latitude) | !is.null(zip)){
-    url <- 'https://congress.api.sunlightfoundation.com/legislators/locate'
-    assert_that(is.null(title),is.null(first_name),is.null(middle_name),is.null(last_name),
+    url <- paste0(cgurl(), "/legislators/locate")
+    stopifnot(is.null(title),is.null(first_name),is.null(middle_name),is.null(last_name),
         is.null(name_suffix),is.null(nickname),is.null(party),is.null(state),is.null(state_name),
         is.null(state_rank),is.null(district),is.null(in_office),is.null(chamber),is.null(gender),
         is.null(phone),is.null(fax),is.null(office),is.null(website),is.null(contact_form),
@@ -58,15 +58,15 @@ cg_legislators <- function(title=NULL, first_name=NULL, middle_name=NULL,
         is.null(youtube_id),is.null(facebook_id),is.null(senate_class),is.null(term_start),
         is.null(term_end),is.null(birthday))
     if(!is.null(latitude) & !is.null(latitude) & is.null(zip)){
-      assert_that(is.null(zip))
-      args <- suncompact(list(apikey=key,latitude=latitude,longitude=longitude,per_page=per_page,page=page,fields=fields,order=order))
+      stopifnot(is.null(zip))
+      args <- sc(list(apikey=key,latitude=latitude,longitude=longitude,per_page=per_page,page=page,fields=fields,order=order))
     } else if(!is.null(zip)){
-      assert_that(is.null(latitude),is.null(longitude))
-      args <- suncompact(list(apikey=key,zip=zip,per_page=per_page,page=page,fields=fields,query=query,order=order))
+      stopifnot(is.null(latitude),is.null(longitude))
+      args <- sc(list(apikey=key,zip=zip,per_page=per_page,page=page,fields=fields,query=query,order=order))
     }
-  } else {  
-    url <- 'https://congress.api.sunlightfoundation.com/legislators'
-    args <- suncompact(list(apikey=key,title=title,first_name=first_name,middle_name=middle_name,
+  } else {
+    url <- paste0(cgurl(), "/legislators")
+    args <- sc(list(apikey=key,title=title,first_name=first_name,middle_name=middle_name,
         last_name=last_name,name_suffix=name_suffix,nickname=nickname,party=party,state=state,
         state_name=state_name,state_rank=state_rank,district=district,in_office=in_office,
         chamber=chamber,gender=gender,phone=phone,fax=fax,office=office,website=website,
@@ -77,9 +77,6 @@ cg_legislators <- function(title=NULL, first_name=NULL, middle_name=NULL,
         facebook_id=facebook_id,senate_class=senate_class,term_start=term_start,term_end=term_end,
         birthday=birthday,per_page=per_page,page=page,fields=fields,query=query,order=order))
   }
-  
-  tt <- GET(url, query=args, ...)
-  stop_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+
+  give_cg(as, url, "", args, ...)
 }

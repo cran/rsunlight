@@ -27,22 +27,22 @@
 #' cg_nominations(committee_ids='SSAS')
 #' cg_nominations(organization='Privacy and Civil Liberties Oversight Board')
 #' cg_nominations(query='Petraeus')
+#'
+#' # most parameters are vectorized, pass in more than one value
+#' cg_nominations(party = c('PN1873-111', 'PN604-112'))
 #' }
 
 cg_nominations <- function(nomination_id=NULL, congress=NULL, number=NULL, received_on=NULL, last_action_at=NULL,
   organization=NULL, committee_ids=NULL, nominees=NULL, nominees.position=NULL, nominees.state=NULL,
   query=NULL, fields=NULL, page=1, per_page=20, order=NULL,
-  key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")), return='table', ...)
-{
+  key = NULL, as = 'table', ...) {
+
+  key <- check_key(key)
   url <- 'https://congress.api.sunlightfoundation.com/nominations'
-  args <- suncompact(list(apikey=key,nomination_id=nomination_id, congress=congress,
+  args <- sc(list(apikey=key,nomination_id=nomination_id, congress=congress,
     number=number, received_on=received_on, last_action_at=last_action_at, organization=organization,
     committee_ids=committee_ids, nominees=nominees, nominees.position=nominees.position,
     nominees.state=nominees.state, query=query, per_page=per_page, page=page, fields=fields,
     order=order))
-
-  tt <- GET(url, query=args, ...)
-  stop_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+  give_cg(as, url, "", args, ...)
 }

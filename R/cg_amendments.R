@@ -37,25 +37,25 @@
 #' cg_amendments(chamber='house', congress=113)
 #' cg_amendments(sponsor_type='committee', sponsor_id='HSRU')
 #' cg_amendments(amends_bill_id='hr624-113')
+#'
+#' # most parameters are vectorized, pass in more than one value
+#' cg_amendments(chamber = c('house', 'senate'), per_page=2)
 #' }
 
 cg_amendments <- function(amendment_id=NULL, amendment_type=NULL, number=NULL, congress=NULL,
   chamber=NULL, house_number=NULL, introduced_on=NULL, last_action_at=NULL, amends_bill_id=NULL,
   amends_treaty_id=NULL, amends_amendment_id=NULL, sponsor_type=NULL, sponsor_id=NULL,
   query=NULL, fields=NULL, page=1, per_page=20, order=NULL,
-  key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")), return='table', ...)
-{
-  url <- 'https://congress.api.sunlightfoundation.com/amendments'
-  args <- suncompact(list(apikey=key, amendment_id=amendment_id, amendment_type=amendment_type, 
-                          number=number, congress=congress, chamber=chamber, house_number=house_number, 
-                          introduced_on=introduced_on, last_action_at=last_action_at, 
-                          amends_bill_id=amends_bill_id,amends_treaty_id=amends_treaty_id, 
-                          amends_amendment_id=amends_amendment_id, sponsor_type=sponsor_type, 
-                          sponsor_id=sponsor_id, query=query, per_page=per_page, page=page, 
-                          fields=fields, order=order))
+  key = NULL, as = 'table', ...) {
 
-  tt <- GET(url, query=args, ...)
-  stop_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+  key <- check_key(key)
+  url <- 'https://congress.api.sunlightfoundation.com/amendments'
+  args <- sc(list(apikey=key, amendment_id=amendment_id, amendment_type=amendment_type,
+                          number=number, congress=congress, chamber=chamber, house_number=house_number,
+                          introduced_on=introduced_on, last_action_at=last_action_at,
+                          amends_bill_id=amends_bill_id,amends_treaty_id=amends_treaty_id,
+                          amends_amendment_id=amends_amendment_id, sponsor_type=sponsor_type,
+                          sponsor_id=sponsor_id, query=query, per_page=per_page, page=page,
+                          fields=fields, order=order))
+  give_cg(as, url, "", args, ...)
 }

@@ -1,6 +1,5 @@
 #' Find the popularity of a phrase over a period of time.
 #'
-#' @import httr
 #' @importFrom plyr rbind.fill
 #' @importFrom stringr str_sub
 #' @template cw
@@ -37,52 +36,41 @@
 #'    geom_line() +
 #'    theme_grey(base_size=20)
 #'
-#' dat_d <- cw_timeseries(phrase='climate change', party="D")
+#' dat_d <- cw_timeseries(phrase = 'climate change', party = "D")
 #' dat_d$party <- rep("D", nrow(dat_d))
-#' dat_r <- cw_timeseries(phrase='climate change', party="R")
+#' dat_r <- cw_timeseries(phrase = 'climate change', party = "R")
 #' dat_r$party <- rep("R", nrow(dat_r))
 #' dat_both <- rbind(dat_d, dat_r)
-#' ggplot(dat_both, aes(day, count, colour=party)) +
+#' ggplot(dat_both, aes(day, count, colour = party)) +
 #'    geom_line() +
-#'    theme_grey(base_size=20) +
-#'    scale_colour_manual(values=c("blue","red"))
-#'
-#'
-#' ## interactive version with Morris.js from rCharts
-#' dream <- lapply(c('D','R'), function(x) cw_timeseries(phrase='climate change', party=x,
-#'    granularity='month'))
-#' df <- merge(dream[[1]], dream[[2]], by='month', all=TRUE)
-#' df[is.na(df)] <- 0
-#' names(df) <- c('date','D','R')
-#' df$date <- as.character(df$date)
-#'
-#' library(rCharts)
-#' m1 <- mPlot(x = "date", y = c("D", "R"), type = "Line", data = df)
-#' m1$set(pointSize = 0, lineWidth = 1)
-#' m1
-#' m1$publish("My Chart", host = 'rpubs') # publish to rpubs
+#'    theme_grey(base_size = 20) +
+#'    scale_colour_manual(values=c("blue", "red"))
 #' }
 
 cw_timeseries <- function(phrase=NULL, date = NULL, start_date=NULL, end_date=NULL,
   chamber=NULL, state=NULL, party=NULL, bioguide_id=NULL, mincount=NULL,
-  percentages=NULL, granularity='day', entity_type=NULL, entity_value=NULL, return='table',
-  key = getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")), ...)
-{
-  splitt<-function(x) paste(str_sub(x, 1, 4), "-", str_sub(x, 5, 6), sep="")
-  url = "http://capitolwords.org/api/dates.json"
-  args <- suncompact(list(apikey=key, phrase=phrase, start_date=start_date,
+  percentages=NULL, granularity='day', entity_type=NULL, entity_value=NULL, as = 'table',
+  key = NULL, ...) {
+
+  key <- check_key(key)
+  splitt <- function(x) paste(str_sub(x, 1, 4), "-", str_sub(x, 5, 6), sep = "")
+  args <- sc(list(apikey=key, phrase=phrase, start_date=start_date,
                        date = date, end_date=end_date, chamber=chamber, state=state,
                        party=party, bioguide_id=bioguide_id, mincount=mincount,
                        percentages=percentages, granularity=granularity,
                        entity_type=entity_type, entity_value=entity_value))
-  tt <- GET(url, query=args, ...)
-  stop_for_status(tt)
-  tmp <- return_obj(return, tt)
-  if(return %in% c('response','list')){ tmp } else { 
-    data <- tmp$results
-    if(granularity=='day'){ data$day <- as.Date(data$day) } else
-      if(granularity=='month'){ data$month <- as.Date(sprintf("%s-01", sapply(data$month, splitt))) } else
-        if(granularity=='year'){ data$year <- as.Date(sprintf("%s-01-01", data$year)) }
-    data
+
+  tmp <- give_cg(as, cwurl(), "/dates.json", args, ...)
+  if (as %in% c('response', 'list')) {
+    tmp
+  } else {
+    if (granularity == 'day') {
+      tmp$day <- as.Date(tmp$day)
+    } else if (granularity == 'month') {
+      tmp$month <- as.Date(sprintf("%s-01", sapply(tmp$month, splitt)))
+    } else if (granularity == 'year') {
+      tmp$year <- as.Date(sprintf("%s-01-01", tmp$year))
+    }
+    tmp
   }
 }

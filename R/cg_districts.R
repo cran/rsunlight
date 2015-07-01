@@ -1,6 +1,5 @@
 #' Get districts for a latitude/longitude or zips
 #'
-#' @import httr
 #' @export
 #' @param latitude (numeric) latitude of coordinate
 #' @param longitude (numeric) longitude of coordinate
@@ -17,18 +16,17 @@
 #' @examples \dontrun{
 #' cg_districts(zip = 27511)
 #' cg_districts(latitude = 35.778788, longitude = -78.787805)
+#'
+#' # most parameters are vectorized, pass in more than one value
+#' cg_districts(zip = c(27511, 97202))
 #' }
 
 cg_districts <- function(latitude = NULL, longitude = NULL, zip = NULL, query=NULL,
-  per_page=20, page=1, order = NULL,
-  key=getOption("SunlightLabsKey", stop("need an API key for Sunlight Labs")),
-  return='table', ...)
-{
-  url = "https://congress.api.sunlightfoundation.com/districts/locate"
-  args <- suncompact(list(apikey = key, latitude = latitude, longitude = longitude, zip = zip,
-                          query=query, per_page=per_page, page=page, order=order))
-  tt <- GET(url, query=args, ...)
-  warn_for_status(tt)
-  assert_that(tt$headers$`content-type` == 'application/json; charset=utf-8')
-  return_obj(return, tt)
+  per_page=20, page=1, order = NULL, key = NULL, as = 'table', ...) {
+
+  key <- check_key(key)
+  args <- sc(list(apikey = key, latitude = latitude, longitude = longitude, zip = zip,
+                          query = query, per_page = per_page, page = page, order = order))
+
+  give_cg(as, cgurl(), "/districts/locate", args, ...)
 }
