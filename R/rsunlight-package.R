@@ -8,34 +8,29 @@
 #' your \code{.Rprofile} file like \code{options(SunlightLabsKey = "key")}. Both are called
 #' on R startup, and then you don't have to enter your API key for each run of a function.
 #'
-#' Currently we have functions to interface with the following Sunlight Foundation APIs, where
-#' functions for each API are prefixed with a two letter code indicating the service.
+#' Currently we have functions to interface with the following Sunlight Foundation APIs,
+#' where functions for each API are prefixed with a two letter code indicating the service.
 #'
 #' \itemize{
 #'  \item Congress API (`cg`)
 #'  \item Open States API (`os`)
 #'  \item Capitol Words API (`cw`)
-#'  \item Influence Explorer API (`ie`)
 #' }
 #'
 #' Note that Puerto Rico is not included in Sunlight Foundation data.
 #'
 #' @importFrom methods is
 #' @importFrom utils head
+#' @importFrom httr GET content stop_for_status parse_url
+#' @importFrom jsonlite fromJSON
+#' @importFrom plyr rbind.fill
+#' @importFrom stringr str_sub
 #' @name rsunlight-package
 #' @aliases rsunlight
 #' @docType package
-#' @title Sunlight Foundation client for R.
 #' @author Scott Chamberlain \email{myrmecocystus@@gmail.com}
 #' @author Thomas J. Leeper \email{thosjleeper@@gmail.com}
 #' @keywords package
-#' @import httr jsonlite
-NULL
-
-#' Sunlight Labs Influence Explorer API sector code and names to use for searching/retreiving data.
-#' @name ie_sectors
-#' @docType data
-#' @keywords datasets
 NULL
 
 #' Congressional sessions, up to the 114th (2015-2016)

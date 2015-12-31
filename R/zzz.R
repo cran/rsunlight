@@ -9,18 +9,18 @@ return_obj <- function(x, y){
     y
   } else {
     if (x == 'list') {
-      fromJSON(y, simplifyVector = FALSE, flatten = TRUE)
+      jsonlite::fromJSON(y, simplifyVector = FALSE, flatten = TRUE)
     } else {
-      fromJSON(y, flatten = TRUE)
+      jsonlite::fromJSON(y, flatten = TRUE)
     }
   }
 }
 
 # check if stupid single left bracket returned
 err_hand <- function(z) {
-  tmp <- content(z, "text")
+  tmp <- httr::content(z, "text")
   if (identical(tmp, "[")) {
-    q <- parse_url(z$request$opts$url)$query
+    q <- httr::parse_url(z$request$opts$url)$query
     q <- paste0("\n - ", paste(names(q), q, sep = "="), collapse = "")
     stop("The following query had no results:\n", q, call. = FALSE)
   } else {
@@ -47,7 +47,7 @@ give <- function(as, url, endpt, args, ...) {
     })
     if (as == "table") {
       tmp <- tmp[vapply(tmp, length, numeric(1)) != 0]
-      tmp <- rbind.fill(tmp)
+      tmp <- plyr::rbind.fill(tmp)
     }
   }
   switch(as,
@@ -118,3 +118,5 @@ cgurl <- function() 'https://congress.api.sunlightfoundation.com'
 cwurl <- function() 'http://capitolwords.org/api'
 ieurl <- function() 'http://transparencydata.com/api/1.0'
 osurl <- function() 'http://openstates.org/api/v1'
+rtieurl <- function() "http://realtime.influenceexplorer.com/api/"
+
