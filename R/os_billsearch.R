@@ -32,9 +32,10 @@
 #' @param per_page Number of records to return. Default: 20. Max: 50.
 #' @param page Page to return. Default: 1. You can use this in combination with the
 #' per_page parameter to get more than the default or max number of results per page.
-#' @param as (character) One of table (default), list, or response (httr response object)
+#' @param as (character) One of table (default), list, or response
+#' (crul response object)
 #' @param key your SunlightLabs API key; loads from .Rprofile
-#' @param ... Curl options passed on to \code{\link[httr]{GET}}
+#' @param ... Curl options passed on to [crul::HttpClient]
 #' @return a data.frame of bills.
 #' @export
 #' @examples \dontrun{
@@ -60,15 +61,15 @@
 #' os_billsearch(terms = 'agriculture', state = "or", chamber = c('upper', 'lower'))
 #' }
 os_billsearch <- function(terms = NULL, state = NULL, window = NULL,
-    chamber = 'upper', sponsor_id = NULL, updated_since = NULL, subject = NULL, type=NULL,
-    search_window=NULL, sort=NULL, page=NULL, per_page=NULL, fields = NULL, as ='table',
-    key = NULL, ...) {
+    chamber = 'upper', sponsor_id = NULL, updated_since = NULL, subject = NULL,
+    type=NULL, search_window=NULL, sort=NULL, page=NULL, per_page=NULL,
+    fields = NULL, as ='table', key = NULL, ...) {
 
-  key <- check_key(key)
-  args <- sc(list(apikey = key, q = terms, state = state, window = window,
-                       chamber = chamber, sponsor_id = sponsor_id,
-                       updated_since = updated_since, subject = subject, type = type,
-                       search_window = search_window, sort = sort, page = page, per_page = per_page,
-                       fields = paste(fields, collapse = ",")))
-  give(as, osurl(), "/bills", args, ...)
+  key <- check_key(key, 'OPEN_STATES_KEY')
+  args <- sc(list(q = terms, state = state, window = window,
+    chamber = chamber, sponsor_id = sponsor_id,
+    updated_since = updated_since, subject = subject, type = type,
+    search_window = search_window, sort = sort, page = page, per_page = per_page,
+    fields = paste(fields, collapse = ",")))
+  give(as, osurl(), "bills", args, key, ...)
 }

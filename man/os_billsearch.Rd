@@ -56,11 +56,12 @@ are not returned unless requested. If you don't supply a fields parameter, you w
 most commonly used subset of fields only. To save on bandwidth, parsing time, and confusion,
 it's recommended to always specify which fields you will be using.}
 
-\item{as}{(character) One of table (default), list, or response (httr response object)}
+\item{as}{(character) One of table (default), list, or response
+(crul response object)}
 
 \item{key}{your SunlightLabs API key; loads from .Rprofile}
 
-\item{...}{Curl options passed on to \code{\link[httr]{GET}}}
+\item{...}{Curl options passed on to \link[crul:HttpClient]{crul::HttpClient}}
 }
 \value{
 a data.frame of bills.
@@ -92,4 +93,3 @@ os_billsearch(terms = 'agriculture', state = c('tx', 'or'))
 os_billsearch(terms = 'agriculture', state = "or", chamber = c('upper', 'lower'))
 }
 }
-

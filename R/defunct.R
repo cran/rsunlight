@@ -109,23 +109,29 @@ ie_sectors <- function(...){
   .Defunct(msg = "Sunlight Foundation Transparency/Influence Explorer API defunct as of January 2016")
 }
 
+#' This function is defunct.
+#' @export
+#' @rdname cg_votes-defunct
+#' @keywords internal
+cg_votes <- function(...){
+  .Defunct(msg = "See ?votes for the new functions")
+}
+
 #' Defunct functions in rsunlight
 #'
-#' \itemize{
-#'  \item \code{\link{ie_politicians}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_organizations}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_industries}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_individuals}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_lobbying}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_grants}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_contracts}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_faca}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_epa}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_entities}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_earmarks}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_contr_bundled}}: Removed. See \code{Influence Explorer} below
-#'  \item \code{\link{ie_contr}}: Removed. See \code{Influence Explorer} below
-#' }
+#' - `ie_politicians`: Removed. See `Influence Explorer` below
+#' - `ie_organizations`: Removed. See `Influence Explorer` below
+#' - `ie_industries`: Removed. See `Influence Explorer` below
+#' - `ie_individuals`: Removed. See `Influence Explorer` below
+#' - `ie_lobbying`: Removed. See `Influence Explorer` below
+#' - `ie_grants`: Removed. See `Influence Explorer` below
+#' - `ie_contracts`: Removed. See `Influence Explorer` below
+#' - `ie_faca`: Removed. See `Influence Explorer` below
+#' - `ie_epa`: Removed. See `Influence Explorer` below
+#' - `ie_entities`: Removed. See `Influence Explorer` below
+#' - `ie_earmarks`: Removed. See `Influence Explorer` below
+#' - `ie_contr_bundled`: Removed. See `Influence Explorer` below
+#' - `ie_contr`: Removed. See `Influence Explorer` below
 #'
 #' @section Influence Explorer:
 #' The Influence Explorer API is now defunct/gone.

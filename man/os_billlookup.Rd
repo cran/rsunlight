@@ -26,11 +26,12 @@ it's recommended to always specify which fields you will be using.}
 \item{page}{Page to return. Default: 1. You can use this in combination with the
 per_page parameter to get more than the default or max number of results per page.}
 
-\item{as}{(character) One of table (default), list, or response (httr response object)}
+\item{as}{(character) One of table (default), list, or response
+(crul response object)}
 
 \item{key}{your SunlightLabs API key; loads from .Rprofile}
 
-\item{...}{Curl options passed on to \code{\link[httr]{GET}}}
+\item{...}{Curl options passed on to \link[crul:HttpClient]{crul::HttpClient}}
 }
 \value{
 List of output fields.
@@ -47,9 +48,6 @@ os_billlookup(state='ca', session=20092010, bill_id='AB 667',
    per_page=3, fields=c('id','title'))
 os_billlookup(state='ca', session=20092010, bill_id='SB 425')
 os_billlookup(state='ca', session=20092010, bill_id=c('AB 667','SB 425'))
-
-library('httr')
-os_billlookup(state='ca', session=20092010, bill_id='AB 667', config=verbose(), per_page=1)
+os_billlookup(state='ca', session=20092010, bill_id='AB 667', verbose = TRUE)
 }
 }
-
